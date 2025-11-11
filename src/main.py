@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from domain.file import router as FileRouter
+from .domain.file import router as file_router
 
 app = FastAPI(
     docs_url="/docs",
@@ -18,7 +18,7 @@ async def root():
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
-app.include_router(FileRouter)
+app.include_router(file_router)
 
 origins = [
     "http://localhost:3000",
