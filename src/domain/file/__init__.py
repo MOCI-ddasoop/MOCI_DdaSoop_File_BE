@@ -1,1 +1,1 @@
-from .file_route import router
+from src.domain.file.controller import router
