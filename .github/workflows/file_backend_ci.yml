@@ -1,0 +1,28 @@
+name: file_backend_ci.yml
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          architecture: 'x64'
+
+      - name: test
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv run pytest src/tests
+          
