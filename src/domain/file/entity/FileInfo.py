@@ -1,9 +1,16 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from pydantic import BaseModel
 from datetime import datetime
-from src.common.database import Base
 
-class FileInfo(Base):
-    __tablename__ = "file_info"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+class FileInfo(BaseModel):
+    id: int
+    filename: str
+    url: str
+    type: str | None
+    size: int | None
+    uploaded_at: datetime
+
+    class Config:
+        orm_mode = True
+
 
 
