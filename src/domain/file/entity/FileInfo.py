@@ -1,16 +1,14 @@
-from pydantic import BaseModel
-from datetime import datetime
+from sqlalchemy import  Column, Integer, String, DateTime
+from sqlalchemy.sql import func
+from sqlalchemy.ext.declarative import declarative_base
+from common.database import Base
 
-class FileInfo(BaseModel):
-    id: int
-    filename: str
-    url: str
-    type: str | None
-    size: int | None
-    uploaded_at: datetime
+class FileInfo(Base):
+    __tablename__ = 'files'
 
-    class Config:
-        orm_mode = True
-
-
-
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    filename = Column(String)
+    url = Column(String)
+    type: str | None = Column(String, nullable=True)
+    size: int | None = Column(Integer, nullable=True)
+    uploaded_at = Column(DateTime, default=func.now())
