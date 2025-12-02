@@ -15,6 +15,12 @@
 
 ### 설치 및 실행
 
+0. **실행시 환경 설정**
+    ```shell
+    export PYTHONPATH="$PWD/src:$PWD"
+    uv run alembic upgrade head
+    ```
+
 1.  **Docker 이미지 빌드**
 
     ```shell
@@ -24,7 +30,7 @@
 2.  **Docker 컨테이너 실행**
 
     ```shell
-    docker run -v uploads:/app/uploads -p 8080:8000 --name moci-ddasoop-file-be moci-ddasoop-file-be
+    docker run -v ./uploads:/app/uploads -p 8080:8000 --name moci-ddasoop-file-be moci-ddasoop-file-be
     ```
 
 ## 📖 API 엔드포인트

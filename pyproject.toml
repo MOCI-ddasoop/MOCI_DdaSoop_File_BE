@@ -4,9 +4,12 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.14"
 dependencies = [
+    "alembic>=1.17.2",
+    "dependency-injector>=4.48.2",
     "fastapi>=0.121.1",
     "gunicorn>=23.0.0",
-    "python-dotenv>=1.2.1",
+    "pydantic-settings>=2.12.0",
+    "python-multipart>=0.0.20",
     "sqlalchemy>=2.0.44",
     "uvicorn>=0.38.0",
 ]

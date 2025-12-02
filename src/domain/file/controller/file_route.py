@@ -1,9 +1,17 @@
 from fastapi import APIRouter, UploadFile,File, Depends, HTTPException
 from sqlalchemy.orm import Session
-from common.database import SessionLocal
 import os
+
+from domain.file.dto.FileInfoDTO import FileInfoDTO
+from common.database import SessionLocal
+from dependency_injector.wiring import inject, Provide
+from domain.file.service import FileService
+from common.dependency_injector import Container
+from common.env import settings
 from domain.file.entity import FileInfo
-from common.env import SERVER_URL
+import asyncio
+from pathlib import Path
+import uuid
 
 router = APIRouter(prefix="/file", tags=["file"])
 UPLOAD_FOLDER:str = './uploads'
@@ -16,22 +24,19 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/upload", response_model=FileInfo)
-async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    file_name = file.filename
-    if file_name is None:
-        raise HTTPException(status_code=404, detail="File not found")
-    filepath = os.path.join(UPLOAD_FOLDER, file_name)
-    with open(filepath, "wb") as f:
-        f.write(file.file.read())
+@router.post("/upload", response_model=FileInfoDTO)
+@inject
+async def upload_file(
+        file: UploadFile = File(...),
+        db: Session = Depends(get_db),
+        svc: FileService = Depends(Provide[Container.file_service])
+) -> FileInfo:
+    ext = Path(file.filename).suffix if file.filename else ""
+    key = f"{uuid.uuid4().hex}{ext}"
+    upload_task = asyncio.create_task(svc.upload(file, key))
+    add_file_task = asyncio.create_task(svc.add_file(file, db, key))
 
-    file_info = FileInfo(
-        filename=file.filename,
-        url=f"{SERVER_URL}/{UPLOAD_FOLDER}/{file.filename}",
-        type=file.content_type,
-        size=os.path.getsize(filepath),
-    )
-    db.add(file_info)
-    db.commit()
-    db.refresh(file_info)
-    return file_info
+    await upload_task
+    return await add_file_task
+
+
