@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from domain.file.controller import router as file_router
@@ -18,6 +19,8 @@ def create_app() -> FastAPI:
         packages=container.wiring_config.packages
     )
     app.container = container
+
+    app.mount("/files", StaticFiles(directory="uploads"), name="files")
 
     app.include_router(file_router)
     app.include_router(home_router)
