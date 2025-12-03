@@ -33,10 +33,7 @@ async def upload_file(
 ) -> FileInfo:
     ext = Path(file.filename).suffix if file.filename else ""
     key = f"{uuid.uuid4().hex}{ext}"
-    upload_task = asyncio.create_task(svc.upload(file, key))
-    add_file_task = asyncio.create_task(svc.add_file(file, db, key))
-
-    await upload_task
-    return await add_file_task
+    image_file_size = await svc.upload(file, key)
+    return await svc.add_file(file, db, key, image_file_size)
 
 
