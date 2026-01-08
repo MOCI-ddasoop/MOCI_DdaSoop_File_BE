@@ -7,6 +7,9 @@
 
 서버 내부에서만 사용할 예정입니다.
 
+## 문서 페이지
+`http://localhost:8000/docs`
+
 ## 🚀 시작하기
 
 ### 전제 조건
@@ -23,7 +26,8 @@
 
 1.  **로컬에서 실행**
     ```shell
-    uvicorn main:app --reload --port 8000
+    pip install uv
+    uv run uvicorn main:app --reload --port 8000
     ```
 
 2.  **Docker로 실행**
