@@ -20,7 +20,7 @@ def create_app() -> FastAPI:
     )
     app.container = container
 
-    app.mount("/files", StaticFiles(directory="uploads"), name="files")
+    app.mount("/uploads", StaticFiles(directory="uploads"), name="files")
 
     app.include_router(file_router)
     app.include_router(home_router)

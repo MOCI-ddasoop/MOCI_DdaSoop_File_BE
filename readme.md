@@ -12,44 +12,64 @@
 ### 전제 조건
 
 - Docker
+- uv
 
 ### 설치 및 실행
 
-0. **실행시 환경 설정**
+0. **Python 경로 설정**
     ```shell
-    export PYTHONPATH="$PWD/src:$PWD"
-    uv run alembic upgrade head
+    source set_python_path.sh
     ```
 
-1.  **Docker 이미지 빌드**
+1.  **로컬에서 실행**
+    ```shell
+    uvicorn main:app --reload --port 8000
+    ```
 
+2.  **Docker로 실행**
+
+    a. **Docker 이미지 빌드**
     ```shell
     docker build -t moci-ddasoop-file-be .
     ```
 
-2.  **Docker 컨테이너 실행**
-
+    b. **Docker 컨테이너 실행**
     ```shell
-    docker run -v ./uploads:/app/uploads -p 8080:8000 --name moci-ddasoop-file-be moci-ddasoop-file-be
+    docker run -v ./uploads:/app/uploads -p 8000:8000 --name moci-ddasoop-file-be moci-ddasoop-file-be
     ```
 
 ## 📖 API 엔드포인트
 
-### `POST /file/upload`
+### `POST /file/url`
+
+-   **설명:** 파일 업로드에 사용할 URL을 생성합니다. (현재 구현은 로컬 호스트 URL을 반환합니다.)
+-   **응답:**
+    -   `200 OK`: `{ "file_url": "http://localhost:8000/file" }`
+
+### `GET /file/url`
+
+-   **설명:** 저장된 파일의 URL을 가져옵니다.
+-   **요청:**
+    -   `file_name` (쿼리 파라미터): 가져올 파일의 이름
+-   **응답:**
+    -   `200 OK`: `{ "file_url": "http://localhost:8000/uploads/{file_name}" }`
+    -   `404 Not Found`: 파일을 찾을 수 없음
+
+### `POST /file/`
 
 -   **설명:** 파일을 업로드합니다.
 -   **요청:**
     -   `file`: 업로드할 파일 (multipart/form-data)
 -   **응답:**
-    -   `200 OK`: 파일 업로드 성공
-        ```json
-        {
-          "file_url": "string",
-          "file_name": "string",
-          "content_type": "string",
-          "size": "integer"
-        }
-        ```
+    -   `200 OK`
+
+### `DELETE /file/{file_name}`
+
+-   **설명:** 지정된 파일을 삭제합니다.
+-   **요청:**
+    -   `file_name` (경로 파라미터): 삭제할 파일의 이름
+-   **응답:**
+    -   `200 OK`
     -   `404 Not Found`: 파일을 찾을 수 없음
 
 ## 📁 프로젝트 구조
@@ -58,44 +78,47 @@
 MOCI-ddassop/backend/MOCI_DdaSoop_File_BE/
 ├───.env.default
 ├───.gitignore
+├───alembic.ini
 ├───Dockerfile
 ├───pyproject.toml
 ├───readme.md
+├───set_python_path.sh
+├───test_main.http
 ├───uv.lock
 ├───.github/
-│   ├───PULL_REQUEST_TEMPLATE.md
-│   ├───ISSUE_TEMPLATE/
-│   │   ├───chore.md
-│   │   ├───docs.md
-│   │   ├───feature.md
-│   │   ├───fix.md
-│   │   ├───perf.md
-│   │   ├───refactor.md
-│   │   ├───style.md
-│   │   └───test.md
-│   └───workflows/
-│       ├───file_backend_cd.yml
-│       └───file_backend_ci.yml
+│   └───...
 ├───src/
+│   ├───__init__.py
 │   ├───main.py
 │   ├───common/
-│   │   ├───database/
-│   │   │   └───database.py
+│   │   ├───dependency_injector/
+│   │   │   └───container.py
 │   │   └───env/
 │   │       ├───config.py
-│   │       └───env.py
+│   │       ├───env.py
+│   │       └───profile/
+│   │           ├───BaseProfileConfig.py
+│   │           ├───DevProfileConfig.py
+│   │           ├───ProdProfileConfig.py
+│   │           └───TestProfileConfig.py
 │   ├───domain/
-│   │   ├───__pycache__/
-│   │   └───file/
-│   │       ├───controller/
-│   │       │   ├───file_route.py
-│   │       │   └───__pycache__/
-│   │       ├───dto/
-│   │       │   ├───FileCreateDTO.py
-│   │       │   └───FileInfoDTO.py
-│   │       └───entity/
-│   │           ├───File.py
+│   │   ├───file/
+│   │   │   ├───controller/
+│   │   │   │   └───file_controller.py
+│   │   │   ├───dto/
+│   │   │   │   ├───FileInfoDTO.py
+│   │   │   │   └───ImageFileSizeDTO.py
+│   │   │   └───service/
+│   │   │       └───file_service.py
+│   │   └───home/
+│   │       └───controller/
+│   │           └───home_router.py
 │   └───tests/
-│       └───__init__.py
+│       ├───domain/
+│       │   └───file/
+│       │       └───controller/
+│       │           └───test_file_route.py
+│       └───resources/
+│           └───sample.jpg
 └───uploads/...
 ```
