@@ -6,7 +6,6 @@ from domain.file.dto.FileInfoDTO import FileInfoDTO
 from dependency_injector.wiring import inject, Provide
 from domain.file.service import FileService
 from common.dependency_injector import Container
-from common.env import settings
 import asyncio
 from pathlib import Path
 import uuid

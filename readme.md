@@ -42,6 +42,12 @@
     docker run -v ./uploads:/app/uploads -p 8000:8000 --name moci-ddasoop-file-be moci-ddasoop-file-be
     ```
 
+   3. **docker-compose로 실행**
+   
+    a. **실행**
+    ```shell
+    docker-compose up -d
+    ```
 ## 📖 API 엔드포인트
 
 ### `POST /file/url`
