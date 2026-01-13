@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
 import os
+from typing import List
 
 from domain.file.dto.FileInfoDTO import FileInfoDTO
 from dependency_injector.wiring import inject, Provide
@@ -35,6 +35,17 @@ async def upload_file(
 ):
     await svc.upload(file)
 
+
+@router.post("/multiple")
+@inject
+async def upload_files(
+        files: List[UploadFile] = File(...),
+        svc: FileService = Depends(Provide[Container.file_service])
+):
+    for file in files:
+        await svc.upload(file)
+
+
 @router.delete("/{file_name}")
 async def delete_file(
         file_name:str,
@@ -46,6 +57,4 @@ async def delete_file(
         os.remove(target_path)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
-
-
 
