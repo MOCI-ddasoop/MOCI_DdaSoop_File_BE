@@ -1,3 +1,8 @@
 .venv
 .idea
 __pycache__/
+.env
+uploads
+dev.db
+database.db
+test.db

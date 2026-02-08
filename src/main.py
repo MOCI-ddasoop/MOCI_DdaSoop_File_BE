@@ -1,34 +1,41 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
-from .domain.file import router as file_router
+from domain.file.controller import router as file_router
+from domain.home.controller import router as home_router
+from common.dependency_injector import Container
 
-app = FastAPI(
-    docs_url="/docs",
-    redoc_url=None,
-)
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title="File API",
+        docs_url="/docs",
+        redoc_url=None,
+    )
+    container = Container()
 
+    container.wire(
+        modules=container.wiring_config.modules,
+        packages=container.wiring_config.packages
+    )
+    app.container = container
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+    app.mount("/uploads", StaticFiles(directory="uploads"), name="files")
 
+    app.include_router(file_router)
+    app.include_router(home_router)
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+    origins = [
+        "http://localhost:3000",
+        "http://localhost:8000"
+    ]
 
-app.include_router(file_router)
-
-origins = [
-    "http://localhost:3000",
-    "http://localhost:8000"
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    return app
+app = create_app()
